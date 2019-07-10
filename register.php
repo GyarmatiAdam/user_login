@@ -7,6 +7,61 @@ if( isset($_SESSION['customers'])!="" ){
 include_once 'dbconnect.php';
 $error = false;
 if ( isset($_POST['btn-signup']) ) {
+
+
+//image upload
+$target_dir = "uploads/";
+$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+$uploadOk = 1;
+$imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+// Check if image file is a actual image or fake image
+    $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+    if($check !== false) {
+        $error = true ;
+        $imgError= "File is an image - " . $check["mime"] . ".";
+        $uploadOk = 1;
+    } 
+    else {
+        $error = true ;
+        $imgError= "File is not an image.";
+        $uploadOk = 0;
+    }
+}
+// Check if file already exists
+if (file_exists($target_file)) {
+    $error = true ;
+    $imgError= "Sorry, file already exists.";
+    $uploadOk = 0;
+}
+// Check file size
+if ($_FILES["fileToUpload"]["size"] > 700000) {
+    $error = true ;
+    $imgError= "Sorry, your file is too large.";
+    $uploadOk = 0;
+}
+// Allow certain file formats
+if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+&& $imageFileType != "gif" ) {
+    $error = true ;
+    $imgError= "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+    $uploadOk = 0;
+}
+// Check if $uploadOk is set to 0 by an error
+if ($uploadOk == 0) {
+    //$error = true ;
+    $imgError= "Sorry, your file was not uploaded.";
+// if everything is ok, try to upload file
+} else {
+    if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+        $error = false ;
+        $sucImg= "The file ". basename( $_FILES["fileToUpload"]["name"]). " has been uploaded.";
+        $image = $_FILES["fileToUpload"]["name"];
+    } else {
+        $error = true ;
+        $imgError= "Sorry, there was an error uploading your file.";
+    }
+}
+
  
  // sanitize user input to prevent sql injection
  $first_name = trim($_POST['first_name']);
@@ -100,7 +155,7 @@ $password = hash('sha256' , $pass);
  // if there's no error, continue to signup
  if( !$error ) {
   
-  $query = "INSERT INTO customers (first_name, last_name , c_email, dob, pass, username) VALUES ('$first_name', '$last_name', '$email', '$dob', '$password', '$username')";
+  $query = "INSERT INTO customers (first_name, last_name , c_email, dob, pass, username, `image`) VALUES ('$first_name', '$last_name', '$email', '$dob', '$password', '$username','$image')";
   $res = mysqli_query($conn, $query);
 
   if ($res) {
@@ -119,7 +174,7 @@ $password = hash('sha256' , $pass);
   
  }
 
-}
+
 ?>
 <!DOCTYPE html> 
 <html>
@@ -134,17 +189,29 @@ $password = hash('sha256' , $pass);
     <div class="col-sm-2">
     </div>
     <div class="col-sm-8">
-   <form method="post"  action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>"  autocomplete="off" >
+   <form method="post" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>"  autocomplete="off" >
     	<h2>Sign Up.</h2>
         <?php    
-           if ( isset($errMSG)) { isset($sucErrMSG)
+           if (isset($errMSG)) {
         ?>  
         <div  class="alert alert-danger" ><?php echo  $errMSG; ?></div>
         <?php 
             }
-            if ( isset($sucErrMSG)) {
+            if (isset($sucErrMSG)) {
         ?>
         <div  class="alert alert-success" ><?php echo  $sucErrMSG; ?></div>
+        <?php 
+            }
+        ?>
+          <?php    
+           if (isset($imgError)) { 
+        ?>  
+        <div  class="alert alert-danger" ><?php echo  $imgError; ?></div>
+        <?php 
+            }
+            if (isset($sucImg)) {
+        ?>
+            <div  class="alert alert-success" ><?php echo  $sucImg; ?></div>
         <?php 
             }
         ?>
@@ -157,10 +224,12 @@ $password = hash('sha256' , $pass);
             <span class = "text-danger" > <?php   echo  $emailError; ?> </span>
         <input type = "date"   name = "dob"   class = "form-control"   placeholder = "YYYY-MM-DD"   maxlength = "40"   value = "<?php echo $dob ?>"  />
             <span class = "text-danger" > <?php   echo  $dobError; ?> </span>
-        <input type = "password"   name = "pass"   class = "form-control"   placeholder = "Enter Password"   maxlength = "12"  value = "<?php echo $pass ?>" />
-            <span class = "text-danger" > <?php   echo  $passError; ?> </span>
         <input type ="text"  name="username"  class ="form-control"  placeholder ="Enter username"  maxlength ="50"   value = "<?php echo $username ?>"  />
             <span class = "text-danger" > <?php   echo  $usernameError; ?> </span>
+        <input type = "password"   name = "pass"   class = "form-control"   placeholder = "Enter Password"   maxlength = "12"  value = "<?php echo $pass ?>" />
+            <span class = "text-danger" > <?php   echo  $passError; ?> </span>
+        <hr/>
+        <input type="file" name="fileToUpload" id="fileToUpload">
         <hr/>
         <button type = "submit"  class = "btn btn-block btn-primary"  name= "btn-signup" >Sign Up</button>
             

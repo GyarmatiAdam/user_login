@@ -16,6 +16,7 @@ $userRow=mysqli_fetch_array($res, MYSQLI_ASSOC);
 <html>
 <head>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
 <title>Welcome - <?php echo $userRow['first_name']; ?></title>
 </head>
 <body >
@@ -28,8 +29,17 @@ $userRow=mysqli_fetch_array($res, MYSQLI_ASSOC);
         <a class="btn btn-warning" href="logout.php?logout">Sign Out</a>
     </div>
     <div class="col-sm-4">
-        
+        <div id="home_image">
+            <?php ; 
+                if(file_exists('src=uploads/'.$userRow["image"].'')){
+                    echo "<img class='img-thumbnail' src=uploads/".$userRow["image"]." >";
+                }
+                else{
+                    echo "<img class='img-thumbnail' src=uploads/noimage.jpg >";
+                }
+            ?>
         <h2><?php echo $userRow['first_name'];echo '<br>'; echo $userRow['last_name']; ?></h2>
+        </div>
     </div>
   </div>
 </div>
