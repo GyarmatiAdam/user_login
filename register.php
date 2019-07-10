@@ -40,12 +40,12 @@ $username = escape('username');
           */
           if (!preg_match("/^[a-zA-Z ]+$/",$first_name)){
             $error = true ;
-            $firstnameError = "Please enter your full first name.";
+            $firstnameError = "Please enter your first name.";
             }
 
           if (!preg_match("/^[a-zA-Z ]+$/",$last_name)){
             $error = true ;
-            $lastnameError = "Please enter your full last name.";
+            $lastnameError = "Please enter your last name.";
             }
 
           if (empty($dob)){
@@ -88,7 +88,7 @@ $username = escape('username');
   $passError = "Password must have atleast 6 characters." ;
  }
  else if(!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,12}$/', $pass)) {
-    echo 'The password does not meet the requirements! <br> 
+    echo 'The password does not meet the requirements!<br> 
     Has to contain a number, a letter and a special character (!@#$%)<br>
     Has to be 8-12 characters';
  }
